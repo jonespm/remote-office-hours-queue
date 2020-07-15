@@ -286,6 +286,15 @@ export const MeetingDropdownTypes = [
     {value: "inperson", displayValue: "In Person"}
 ];
 
+export const convertMeetingTypeToDisplay = (backendType: string) => {
+    if (backendType === "bluejeans") {
+        return ("BlueJeans");
+    }
+    else if (backendType === "inperson") {
+        return ("In Person");
+    }
+}
+
 interface MeetingTypeDropdownProps {
     options: DropdownValue[];
     value: string;

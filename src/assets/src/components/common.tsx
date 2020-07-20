@@ -310,7 +310,7 @@ export const MeetingTypeDropdown: React.FC<MeetingTypeDropdownProps> = (props) =
     }
     
     return (
-        <select defaultValue={props.defaultValue} onChange={handleChange}>
+        <select className="btn btn-sm select-dropdown" defaultValue={props.defaultValue} onChange={handleChange}>
             <option value='default'>Meeting via...</option>
             {dropdownOptions}
         </select>

@@ -70,7 +70,8 @@ class Queue(SafeDeleteModel):
             choices=MEETING_BACKEND_TYPES,
             blank=False,
         ),
-        default=list(DEFAULT_ALLOWED_TYPES)
+        size=2,
+        default=lambda: list(DEFAULT_ALLOWED_TYPES),
     )
 
     def __str__(self):

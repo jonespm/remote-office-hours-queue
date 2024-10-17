@@ -14,8 +14,6 @@ on:
         default: 'MAJOR.MINOR.MICRO'
    
 jobs:
-  env:
-    REPO_URL: ${{ github.repository }}
   build:
     # to test a feature, change the repo name to your github id. I'm not sure of a better way to check this.
     if: github.repository_owner == 'jonespm' || github.event_name == 'workflow_dispatch'

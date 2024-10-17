@@ -1,0 +1,80 @@
+name: ROHQ Build/Release
+
+on:
+  push:
+    branches: 
+      - master
+ 
+# Used to release a new version
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+        default: 'MAJOR.MINOR.MICRO'
+env:
+  REPO_URL: ${{ github.repository }}
+  # to test a feature, change the repo name to your github id
+  #REPO_OWNER: 'tl-its-umich-edu'
+  REPO_OWNER: 'jonespm'
+    
+jobs:
+  build:
+    if: github.repository_owner == env.REPO_OWNER || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+  
+      - name: Checkout code 
+        uses: actions/checkout@v4
+    
+      - name: Extract branch name
+        id: extract_branch
+        run: echo "BRANCH_NAME=$(basename ${{ github.ref }})" >> $GITHUB_ENV
+      
+      - name: build Docker image
+        run: |
+          docker build . --tag ghcr.io/${{ env.REPO_URL }}:${BRANCH_NAME}
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker push ghcr.io/${{ env.REPO_URL }}:${BRANCH_NAME}
+    
+  release: 
+    # Making sure that release only runs for tag pushes
+    if: startsWith(github.ref, 'refs/tags/') && github.repository_owner == env.REPO_OWNER
+    needs: build # This ensures the build job finishes successfully before starting this job
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Draft Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+
+  # Creates a tag if workflow_dispatch is ran on branch and tag doesn't exist
+  create_tag:
+    if: github.event_name == 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if tag exists and create it if not
+        run: |
+          if git rev-parse "refs/tags/${{ github.event.inputs.version }}" >/dev/null 2>&1; then
+            echo "Skipping tag creation because tag ${{ github.event.inputs.version }} already exists."
+          else
+            git tag ${{ github.event.inputs.version }}
+            git push origin ${{ github.event.inputs.version }}
+            echo "Tag ${{ github.event.inputs.version }} created and pushed."

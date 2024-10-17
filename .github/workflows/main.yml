@@ -12,7 +12,7 @@ on:
         description: 'Version'
         required: true
         default: 'MAJOR.MINOR.MICRO'
-   
+
 jobs:
   build:
     # to test a feature, change the repo name to your github id. I'm not sure of a better way to check this.
@@ -29,7 +29,7 @@ jobs:
       
       - name: build Docker image
         run: |
-          docker build . --tag ghcr.io/${{ env.REPO_URL }}:${BRANCH_NAME}
+          docker build ./src --tag ghcr.io/${{ github.repository }}:${BRANCH_NAME}
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -40,7 +40,7 @@ jobs:
       
       - name: Push Docker image to GitHub Container Registry
         run: |
-          docker push ghcr.io/${{ env.REPO_URL }}:${BRANCH_NAME}
+          docker push ghcr.io/${{ github.repository }}:${BRANCH_NAME}
     
   release: 
     # Making sure that release only runs for tag pushes

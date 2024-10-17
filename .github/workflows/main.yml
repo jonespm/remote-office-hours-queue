@@ -20,7 +20,7 @@ env:
     
 jobs:
   build:
-    if: github.repository_owner == env.REPO_OWNER || github.event_name == 'workflow_dispatch'
+    if: github.repository_owner == ${{ env.REPO_OWNER }} || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
   
@@ -48,7 +48,7 @@ jobs:
     
   release: 
     # Making sure that release only runs for tag pushes
-    if: startsWith(github.ref, 'refs/tags/') && github.repository_owner == env.REPO_OWNER
+    if: startsWith(github.ref, 'refs/tags/') && github.repository_owner == ${{ env.REPO_OWNER }}
     needs: build # This ensures the build job finishes successfully before starting this job
     runs-on: ubuntu-latest
     steps:

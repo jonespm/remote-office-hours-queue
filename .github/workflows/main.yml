@@ -12,6 +12,8 @@ on:
         description: 'Version'
         required: true
         default: 'MAJOR.MINOR.MICRO'
+    description: 'Manually trigger the workflow to create a new version tag, and draft a release. If master is selected and tag does not exist this will create the tag. Otherwise select the tag that is pre-created.'
+          
 
 jobs:
   build:

@@ -3,11 +3,11 @@ FROM node:18-alpine AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds
-COPY package.json package-lock.json webpack.config.js tsconfig.json /usr/src/app/
+COPY src/package.json src/package-lock.json src/webpack.config.js src/tsconfig.json /usr/src/app/
 RUN npm install
 
 # NOTE: assets/ likely to change between dev builds
-COPY assets /usr/src/app/assets
+COPY src/assets /usr/src/app/assets
 RUN npm run prod
 
 #####################################################################
@@ -28,7 +28,7 @@ RUN pip install \
     'gunicorn==20.1.0' \
     'uvicorn[standard]==0.22.0' \
     'psycopg2~=2.9.5'
-COPY requirements.txt /tmp
+COPY src/requirements.txt /tmp
 RUN pip install -r /tmp/requirements.txt
 
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
@@ -39,5 +39,5 @@ COPY --from=node-webpack /usr/src/app/webpack-stats.json webpack-stats.json
 COPY --from=node-webpack /usr/src/app/assets assets
 COPY --from=node-webpack /usr/src/app/node_modules node_modules
 
-COPY . /usr/src/app
+COPY src /usr/src/app
 RUN chmod -R g+rw /usr/src/app
